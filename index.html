@@ -827,7 +827,11 @@ Lógica MASTER: créditos do Dadadt1 − total dos revendedores = saldo do MASTE
 
     function parseComprovantes(text) {
       const results = [];
-      const cleaned = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      const cleaned = text
+  .replace(/\r\n/g, '\n')
+  .replace(/\r/g, '\n')
+  .replace(/\*/g, '')
+  .replace(/_/g, '');
 
       const revendaRegex = /Revenda\s*:\s*(.+?)(?:\n|$)/gi;
       const creditosRegex = /Cr[eé]ditos\s+adicionados\s*:\s*([\d.,]+)/gi;
