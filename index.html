@@ -962,8 +962,8 @@ Lógica MASTER: créditos do Dadadt1 − total dos revendedores = saldo do MASTE
       const calc = calcMasterAndOthers(data[key].resellers);
 
       document.getElementById('masterName').textContent = MASTER_NAME;
-      document.getElementById('masterCredits').textContent = formatNum(calc.masterDisplay);
-      document.getElementById('masterHint').textContent =
+      document.getElementById('masterCredits').textContent = formatNum(calc.masterRaw);
+      document.getElementById('masterHint').textContent = 'créditos adicionados ao MASTER';
         (calc.masterRaw > 0 || calc.othersTotal > 0)
           ? formatNum(calc.masterRaw) + ' adicionados − ' + formatNum(calc.othersTotal) + ' dos revendedores'
           : 'créditos adicionados − total dos revendedores';
