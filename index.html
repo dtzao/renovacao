@@ -962,7 +962,8 @@ Lógica MASTER: créditos do Dadadt1 − total dos revendedores = saldo do MASTE
       const calc = calcMasterAndOthers(data[key].resellers);
 
       document.getElementById('masterName').textContent = MASTER_NAME;
-      document.getElementById('masterCredits').textContent = formatNum(calc.masterRaw);
+      document.getElementById('masterCredits').textContent =
+  formatNum(calc.masterRaw) + ' = ' + formatNum(calc.masterRaw / 10);
       document.getElementById('masterHint').textContent = 'créditos adicionados ao MASTER';
         (calc.masterRaw > 0 || calc.othersTotal > 0)
           ? formatNum(calc.masterRaw) + ' adicionados − ' + formatNum(calc.othersTotal) + ' dos revendedores'
@@ -980,7 +981,7 @@ Lógica MASTER: créditos do Dadadt1 − total dos revendedores = saldo do MASTE
         return '<tr>' +
           '<td><span class="rank ' + rankClass + '">' + medal + '</span></td>' +
           '<td>' + escapeHtml(r.name) + '</td>' +
-          '<td class="credits-cell" style="text-align:right">' + formatNum(r.credits) + '</td>' +
+          '<td class="credits-cell" style="text-align:right">' + formatNum(r.credits) + ' = ' + formatNum(r.credits / 10) + '</td>' +
           '</tr>';
       }).join('');
     }
