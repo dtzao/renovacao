@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Renovações | Controle de Créditos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1419;
+      --bg-card: #1a2332;
+      --bg-input: #0d1117;
+      --border: #2d3a4f;
+      --text: #e6edf3;
+      --text-muted: #8b9cb3;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gold: #fbbf24;
+      --silver: #94a3b8;
+      --bronze: #d97706;
+      --accent: #8b5cf6;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+    }
+
+    .logo h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo span {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn:hover {
+      background: #243044;
+      border-color: #3d4f6a;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239,68,68,0.15);
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .stat-card.success::before { background: var(--success); }
+    .stat-card.accent::before { background: var(--accent); }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .tabs-wrap {
+      overflow-x: auto;
+      margin-bottom: 20px;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      min-width: max-content;
+    }
+
+    .tab {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .tab:hover {
+      color: var(--text);
+      border-color: #3d4f6a;
+    }
+
+    .tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(59,130,246,0.35);
+    }
+
+    .tab.has-data::after {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .tab.active.has-data::after {
+      background: #fff;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 14px;
+      font-family: 'Inter', monospace;
+      font-size: 0.85rem;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .process-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #141c28;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td { background: rgba(59,130,246,0.06); }
+
+    .rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+
+    .rank-1 { background: rgba(251,191,36,0.2); color: var(--gold); }
+    .rank-2 { background: rgba(148,163,184,0.2); color: var(--silver); }
+    .rank-3 { background: rgba(217,119,6,0.2); color: var(--bronze); }
+    .rank-n { background: rgba(139,156,179,0.15); color: var(--text-muted); }
+
+    .credits-cell {
+      font-weight: 700;
+      color: var(--success);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 14px 12px 40px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .history-list {
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+    }
+
+    .history-time {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .history-entries {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .history-chip {
+      background: rgba(59,130,246,0.15);
+      border: 1px solid rgba(59,130,246,0.3);
+      color: #93c5fd;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .history-chip span {
+      color: var(--success);
+      margin-left: 4px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 260px;
+      margin-top: 8px;
+    }
+
+    .search-result {
+      display: none;
+      margin-top: 12px;
+      padding: 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .search-result.visible { display: block; }
+
+    .search-result h4 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--primary);
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
+    }
+
+    .month-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .month-pill .m-name {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .month-pill .m-val {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--success);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 20px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      font-weight: 600;
+      font-size: 0.9rem;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error { border-left: 4px solid var(--danger); }
+    .toast.info { border-left: 4px solid var(--primary); }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 900;
+      padding: 16px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .modal h3 {
+      margin-bottom: 12px;
+      font-size: 1.15rem;
+    }
+
+    .modal p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: #3d4f6a;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: #4d6280; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(59,130,246,0.2);
+      color: #93c5fd;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <h1>Painel de Renovações</h1>
+          <span>Controle de créditos por revendedor</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-sm btn-danger" onclick="confirmClearMonth()" title="Limpar mês atual">🗑 Limpar mês</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmClearAll()" title="Limpar todos os dados">⚠ Limpar tudo</button>
+      </div>
+    </header>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+      <div class="card stat-card">
+        <div class="stat-label">Total de Créditos (mês)</div>
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-sub" id="statMonthName">—</div>
+      </div>
+      <div class="card stat-card success">
+        <div class="stat-label">Revendedores</div>
+        <div class="stat-value" id="statResellers">0</div>
+        <div class="stat-sub">ativos neste mês</div>
+      </div>
+      <div class="card stat-card accent">
+        <div class="stat-label">Registros processados</div>
+        <div class="stat-value" id="statRecords">0</div>
+        <div class="stat-sub">neste mês</div>
+      </div>
+    </div>
+
+    <!-- Month tabs -->
+    <div class="tabs-wrap">
+      <div class="tabs" id="monthTabs"></div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-grid">
+      <!-- Left: Input -->
+      <div class="card">
+        <div class="section-title">📋 Cole os comprovantes</div>
+        <textarea id="pasteArea" placeholder="Cole aqui um ou vários comprovantes de recarga...
+
+O sistema extrai automaticamente:
+• Revenda: (nome)
+• Créditos adicionados: (quantidade)
+
+Pode colar o texto completo — Saldo atual e outras linhas são ignorados."></textarea>
+        <div class="process-row">
+          <button class="btn btn-primary" onclick="processText()">⚡ Processar e somar</button>
+          <button class="btn" onclick="document.getElementById('pasteArea').value=''">Limpar texto</button>
+        </div>
+      </div>
+
+      <!-- Right: Ranking table (principal) -->
+      <div class="card">
+        <div class="section-title">🏆 Ranking do mês <span class="badge" id="monthBadge">Janeiro</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px">#</th>
+                <th>Revenda</th>
+                <th style="text-align:right">Créditos</th>
+              </tr>
+            </thead>
+            <tbody id="rankingBody">
+              <tr><td colspan="3"><div class="empty">Nenhum dado neste mês ainda.</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search + History -->
+    <div class="main-grid">
+      <div class="card">
+        <div class="section-title">🔍 Buscar revendedor</div>
+        <div class="search-box">
+          <span class="search-icon">🔎</span>
+          <input type="text" id="searchInput" placeholder="Digite o nome do revendedor..." oninput="searchReseller()" />
+        </div>
+        <div class="search-result" id="searchResult"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">📝 Histórico de lançamentos</div>
+        <div class="history-list" id="historyList">
+          <div class="empty">Nenhum lançamento ainda.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card" style="margin-top:20px">
+      <div class="section-title">📈 Créditos por mês (ano)</div>
+      <div class="chart-container">
+        <canvas id="yearChart"></canvas>
+      </div>
+    </div>
+
+    <footer>
+      Dados salvos localmente no navegador (LocalStorage) · Offline
+    </footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-overlay" id="modalClearMonth">
+    <div class="modal">
+      <h3>Limpar mês atual?</h3>
+      <p>Todos os dados de <strong id="modalMonthName"></strong> serão apagados permanentemente. Esta ação não pode ser desfeita.</p>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal('modalClearMonth')">Cancelar</button>
+        <button class="btn btn-danger" onclick="clearCurrentMonth()">Sim, limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalClearAll">
+    <div class="modal">
+      <h3>Limpar TODOS os dados?</h3>
+      <p>Todos os meses, históricos e rankings serão apagados.</p>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal('modalClearAll')">Cancelar</button>
+        <button class="btn btn-danger" onclick="clearAllData()">Sim, apagar tudo</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MONTHS = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+    const MONTH_KEYS = [
+      'jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+      'jul', 'ago', 'set', 'out', 'nov', 'dez'
+    ];
+
+    let currentMonth = new Date().getMonth();
+    let chartInstance = null;
+
+    function getData() {
+      try {
+        const raw = localStorage.getItem('renovacoes_panel_v1');
+        if (!raw) return initEmptyData();
+        return JSON.parse(raw);
+      } catch {
+        return initEmptyData();
+      }
+    }
+
+    function initEmptyData() {
+      const data = {};
+      MONTH_KEYS.forEach(k => {
+        data[k] = { resellers: {}, history: [], records: 0 };
+      });
+      return data;
+    }
+
+    function saveData(data) {
+      localStorage.setItem('renovacoes_panel_v1', JSON.stringify(data));
+    }
+
+    function getMonthKey(idx) {
+      return MONTH_KEYS[idx];
+    }
+
+    // Extrai APENAS Revenda + Créditos adicionados (ignora saldo, agradecimentos etc.)
+    function parseComprovantes(text) {
+      const results = [];
+      const cleaned = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+      const revendaRegex = /Revenda\s*:\s*(.+?)(?:\n|$)/gi;
+      const creditosRegex = /Cr[eé]ditos\s+adicionados\s*:\s*([\d.,]+)/gi;
+
+      const revendas = [];
+      const creditos = [];
+
+      let m;
+      while ((m = revendaRegex.exec(cleaned)) !== null) {
+        revendas.push(m[1].trim());
+      }
+      while ((m = creditosRegex.exec(cleaned)) !== null) {
+        const num = parseFloat(m[1].replace(/\./g, '').replace(',', '.'));
+        if (!isNaN(num)) creditos.push(num);
+      }
+
+      const len = Math.min(revendas.length, creditos.length);
+      for (let i = 0; i < len; i++) {
+        if (revendas[i] && creditos[i] > 0) {
+          results.push({ name: revendas[i], credits: creditos[i] });
+        }
+      }
+
+      // Fallback linha a linha
+      if (results.length === 0) {
+        const lines = cleaned.split('\n').map(l => l.trim()).filter(Boolean);
+        let pendingName = null;
+        for (const line of lines) {
+          const nameMatch = line.match(/Revenda\s*:\s*(.+)/i);
+          const credMatch = line.match(/Cr[eé]ditos\s+adicionados\s*:\s*([\d.,]+)/i);
+          if (nameMatch) pendingName = nameMatch[1].trim();
+          if (credMatch && pendingName) {
+            const num = parseFloat(credMatch[1].replace(/\./g, '').replace(',', '.'));
+            if (!isNaN(num) && num > 0) {
+              results.push({ name: pendingName, credits: num });
+              pendingName = null;
+            }
+          }
+        }
+      }
+
+      return results;
+    }
+
+    function processText() {
+      const text = document.getElementById('pasteArea').value.trim();
+      if (!text) {
+        showToast('Cole algum texto antes de processar.', 'error');
+        return;
+      }
+
+      const parsed = parseComprovantes(text);
+      if (parsed.length === 0) {
+        showToast('Nenhum comprovante reconhecido. Verifique se há "Revenda:" e "Créditos adicionados:".', 'error');
+        return;
+      }
+
+      const data = getData();
+      const key = getMonthKey(currentMonth);
+      const monthData = data[key];
+
+      const batch = [];
+      parsed.forEach(({ name, credits }) => {
+        const normalized = name.trim();
+        if (!monthData.resellers[normalized]) {
+          monthData.resellers[normalized] = 0;
+        }
+        monthData.resellers[normalized] += credits;
+        monthData.records = (monthData.records || 0) + 1;
+        batch.push({ name: normalized, credits });
+      });
+
+      monthData.history.unshift({
+        timestamp: new Date().toISOString(),
+        entries: batch
+      });
+
+      if (monthData.history.length > 100) {
+        monthData.history = monthData.history.slice(0, 100);
+      }
+
+      saveData(data);
+      document.getElementById('pasteArea').value = '';
+      renderAll();
+      showToast(`✅ ${parsed.length} comprovante(s) processado(s)!`, 'success');
+    }
+
+    function renderAll() {
+      renderTabs();
+      renderDashboard();
+      renderRanking();
+      renderHistory();
+      renderChart();
+      document.getElementById('monthBadge').textContent = MONTHS[currentMonth];
+    }
+
+    function renderTabs() {
+      const data = getData();
+      const container = document.getElementById('monthTabs');
+      container.innerHTML = '';
+      MONTHS.forEach((name, idx) => {
+        const key = MONTH_KEYS[idx];
+        const hasData = Object.keys(data[key].resellers || {}).length > 0;
+        const btn = document.createElement('button');
+        btn.className = 'tab' + (idx === currentMonth ? ' active' : '') + (hasData ? ' has-data' : '');
+        btn.textContent = name;
+        btn.onclick = () => {
+          currentMonth = idx;
+          renderAll();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function renderDashboard() {
+      const data = getData();
+      const key = getMonthKey(currentMonth);
+      const monthData = data[key];
+      const resellers = monthData.resellers || {};
+      const names = Object.keys(resellers);
+      const total = names.reduce((s, n) => s + resellers[n], 0);
+
+      document.getElementById('statTotal').textContent = formatNum(total);
+      document.getElementById('statMonthName').textContent = MONTHS[currentMonth];
+      document.getElementById('statResellers').textContent = names.length;
+      document.getElementById('statRecords').textContent = monthData.records || 0;
+    }
+
+    function renderRanking() {
+      const data = getData();
+      const key = getMonthKey(currentMonth);
+      const resellers = data[key].resellers || {};
+      const sorted = Object.entries(resellers)
+        .map(([name, credits]) => ({ name, credits }))
+        .sort((a, b) => b.credits - a.credits);
+
+      const tbody = document.getElementById('rankingBody');
+      if (sorted.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3"><div class="empty">Nenhum dado neste mês ainda.</div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = sorted.map((r, i) => {
+        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+        return `
+          <tr>
+            <td><span class="rank ${rankClass}">${medal}</span></td>
+            <td>${escapeHtml(r.name)}</td>
+            <td class="credits-cell" style="text-align:right">${formatNum(r.credits)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderHistory() {
+      const data = getData();
+      const key = getMonthKey(currentMonth);
+      const history = data[key].history || [];
+      const container = document.getElementById('historyList');
+
+      if (history.length === 0) {
+        container.innerHTML = '<div class="empty">Nenhum lançamento ainda.</div>';
+        return;
+      }
+
+      container.innerHTML = history.slice(0, 50).map(h => {
+        const date = new Date(h.timestamp);
+        const timeStr = date.toLocaleString('pt-BR', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+        const chips = (h.entries || []).map(e =>
+          `<span class="history-chip">${escapeHtml(e.name)} <span>+${formatNum(e.credits)}</span></span>`
+        ).join('');
+        return `
+          <div class="history-item">
+            <div class="history-time">${timeStr}</div>
+            <div class="history-entries">${chips}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderChart() {
+      const data = getData();
+      const totals = MONTH_KEYS.map(k => {
+        const res = data[k].resellers || {};
+        return Object.values(res).reduce((s, v) => s + v, 0);
+      });
+
+      const ctx = document.getElementById('yearChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: MONTHS.map(m => m.slice(0, 3)),
+          datasets: [{
+            label: 'Créditos',
+            data: totals,
+            backgroundColor: MONTH_KEYS.map((_, i) =>
+              i === currentMonth ? 'rgba(59,130,246,0.85)' : 'rgba(59,130,246,0.35)'
+            ),
+            borderColor: MONTH_KEYS.map((_, i) =>
+              i === currentMonth ? 'rgb(59,130,246)' : 'rgba(59,130,246,0.5)'
+            ),
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => formatNum(ctx.raw) + ' créditos'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(45,58,79,0.6)' },
+              ticks: {
+                color: '#8b9cb3',
+                callback: v => formatNum(v)
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: '#8b9cb3' }
+            }
+          }
+        }
+      });
+    }
+
+    function searchReseller() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const panel = document.getElementById('searchResult');
+      if (!q) {
+        panel.classList.remove('visible');
+        panel.innerHTML = '';
+        return;
+      }
+
+      const data = getData();
+      const matches = new Map();
+
+      MONTH_KEYS.forEach((key, idx) => {
+        const resellers = data[key].resellers || {};
+        Object.entries(resellers).forEach(([name, credits]) => {
+          if (name.toLowerCase().includes(q)) {
+            if (!matches.has(name)) {
+              matches.set(name, { months: {} });
+            }
+            matches.get(name).months[idx] = credits;
+          }
+        });
+      });
+
+      if (matches.size === 0) {
+        panel.classList.add('visible');
+        panel.innerHTML = '<p style="color:var(--text-muted)">Nenhum revendedor encontrado.</p>';
+        return;
+      }
+
+      let html = '';
+      matches.forEach((info, name) => {
+        html += `<h4>${escapeHtml(name)}</h4>`;
+        html += '<div class="month-grid">';
+        MONTHS.forEach((m, i) => {
+          const val = info.months[i] || 0;
+          if (val > 0) {
+            html += `
+              <div class="month-pill">
+                <div class="m-name">${m.slice(0, 3)}</div>
+                <div class="m-val">${formatNum(val)}</div>
+              </div>
+            `;
+          }
+        });
+        html += '</div>';
+      });
+
+      panel.classList.add('visible');
+      panel.innerHTML = html;
+    }
+
+    function confirmClearMonth() {
+      document.getElementById('modalMonthName').textContent = MONTHS[currentMonth];
+      document.getElementById('modalClearMonth').classList.add('open');
+    }
+
+    function confirmClearAll() {
+      document.getElementById('modalClearAll').classList.add('open');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function clearCurrentMonth() {
+      const data = getData();
+      const key = getMonthKey(currentMonth);
+      data[key] = { resellers: {}, history: [], records: 0 };
+      saveData(data);
+      closeModal('modalClearMonth');
+      renderAll();
+      showToast(`Mês ${MONTHS[currentMonth]} limpo.`, 'info');
+    }
+
+    function clearAllData() {
+      saveData(initEmptyData());
+      closeModal('modalClearAll');
+      renderAll();
+      showToast('Todos os dados foram apagados.', 'info');
+    }
+
+    function formatNum(n) {
+      if (Number.isInteger(n)) return n.toLocaleString('pt-BR');
+      return n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function showToast(msg, type = 'info') {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast ' + type + ' show';
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        el.classList.remove('show');
+      }, 3200);
+    }
+
+    document.getElementById('pasteArea').addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        processText();
+      }
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
